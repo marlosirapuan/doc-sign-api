@@ -9,6 +9,10 @@ class DocumentService
     pdf_path, signature_path = upload_files
     signature_coordinates    = extract_signature_coordinates
 
+    if File.extname(pdf_path) == ".docx"
+      pdf_path = convert_docx_to_pdf(pdf_path)
+    end
+
     document = create_document(pdf_path, signature_path)
     generate_signed_pdf(document, signature_coordinates)
   end
@@ -23,6 +27,17 @@ class DocumentService
       save_uploaded_file(pdf_file),
       save_uploaded_file(signature_file)
     ]
+  end
+
+  def convert_docx_to_pdf(docx_path)
+    output_dir = File.dirname(docx_path)
+
+    system("libreoffice --headless --convert-to pdf #{Shellwords.escape(docx_path)} --outdir #{Shellwords.escape(output_dir)}")
+    pdf_path = docx_path.sub(/\.docx$/, ".pdf")
+
+    raise "Fail to convert DOCX para PDF" unless File.exist?(pdf_path)
+
+    pdf_path
   end
 
   def generate_signed_pdf(document, signature_coordinates)
