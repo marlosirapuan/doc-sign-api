@@ -36,6 +36,10 @@ gem "thruster", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
+# PDF utisl
+gem "prawn"
+gem "combine_pdf"
+
 group :test do
   # Improve messages output
   gem "minitest-reporters"
