@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    container_name: docsign_api_app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      RAILS_ENV: development
+    command: bash -c "
+      rm -f tmp/pids/server.pid &&
+      rails db:prepare &&
+      rails server -b 0.0.0.0
+      "
+
+  test:
+    build: .
+    container_name: docsign_api_test
+    volumes:
+      - .:/app
+    environment:
+      RAILS_ENV: test
+    command: bash -c "rails db:migrate && rails test"
