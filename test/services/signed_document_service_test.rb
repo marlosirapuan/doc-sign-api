@@ -1,6 +1,6 @@
 require "test_helper"
 
-class DocumentServiceTest < ActiveSupport::TestCase
+class SignedDocumentServiceTest < ActiveSupport::TestCase
   setup do
     user = User.create!(
       name: "User One",
@@ -18,7 +18,7 @@ class DocumentServiceTest < ActiveSupport::TestCase
 
   test "should generate a signed pdf" do
     # Arrange
-    service = DocumentService.new(@document, 150, 250)
+    service = SignedDocumentService.new(@document, 150, 250)
 
     # Act
     service.generate_signed_pdf
@@ -48,7 +48,7 @@ class DocumentServiceTest < ActiveSupport::TestCase
       signed: false
     )
 
-    service = DocumentService.new(document_without_signature)
+    service = SignedDocumentService.new(document_without_signature)
 
     # Assert
     error = assert_raises(RuntimeError) { service.generate_signed_pdf }
