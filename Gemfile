@@ -44,4 +44,9 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Adds step-by-step debugging and stack navigation capabilities to pry using byebug.
+  gem "pry-byebug", "~> 3.11.0"
+  # This is a small gem which causes rails console to open pry
+  gem "pry-rails", "~> 0.3.11"
 end
