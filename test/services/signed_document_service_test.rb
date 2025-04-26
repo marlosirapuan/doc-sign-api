@@ -10,7 +10,7 @@ class SignedDocumentServiceTest < ActiveSupport::TestCase
 
     @document = Document.create!(
       user: user,
-      file_path: Rails.root.join("test/fixtures/files/example.pdf").to_s,
+      file_path: Rails.root.join("test/fixtures/files/example_pdf.pdf").to_s,
       signature_path: Rails.root.join("test/fixtures/files/example_signature.png").to_s,
       signed: false
     )
@@ -43,7 +43,7 @@ class SignedDocumentServiceTest < ActiveSupport::TestCase
     # Act
     document_without_signature = Document.create!(
       user: user,
-      file_path: Rails.root.join("test/fixtures/files/example.pdf").to_s,
+      file_path: Rails.root.join("test/fixtures/files/example_pdf.pdf").to_s,
       signature_path: nil,
       signed: false
     )

@@ -8,7 +8,7 @@ class DocumentServiceTest < ActiveSupport::TestCase
       password: "password123"
     )
 
-    @pdf_file       = fixture_file_upload("example.pdf", "application/pdf")
+    @pdf_file       = fixture_file_upload("example_pdf.pdf", "application/pdf")
     @signature_file = fixture_file_upload("example_signature.png", "image/png")
 
     @valid_input = {

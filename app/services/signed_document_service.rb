@@ -14,7 +14,7 @@ class SignedDocumentService
   def generate_signed_pdf
     validate_signature_path!
 
-    signed_pdf_path = generate_signed_pdf_path
+    signed_pdf_path    = generate_signed_pdf_path
     signature_pdf_path = create_signature_pdf
 
     combine_and_save_pdfs(signature_pdf_path, signed_pdf_path)

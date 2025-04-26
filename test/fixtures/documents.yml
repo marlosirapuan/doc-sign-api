@@ -2,6 +2,6 @@
 
 one:
   user: one
-  file_path: <%= Rails.root.join("test", "fixtures", "files", "example.pdf") %>
+  file_path: <%= Rails.root.join("test", "fixtures", "files", "example_pdf.pdf") %>
   signed: false
 
