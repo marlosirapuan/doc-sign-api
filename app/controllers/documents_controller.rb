@@ -10,11 +10,7 @@ class DocumentsController < ApplicationController
   end
 
   def create
-    pdf_path, signature_path = upload_files
-    signature_coordinates    = extract_signature_coordinates
-
-    document = create_document(pdf_path, signature_path)
-    generate_signed_pdf(document, signature_coordinates)
+    document = DocumentService.new(@current_user, params).create_and_sign_document
 
     render json: { document: document }, status: :created
   end
@@ -27,41 +23,6 @@ class DocumentsController < ApplicationController
     else
       render json: { error: "File not found" }, status: :not_found
     end
-  end
-
-  private
-
-  def upload_files
-    pdf_file, signature_file = params.values_at(:file, :signature)
-    [
-      save_uploaded_file(pdf_file),
-      save_uploaded_file(signature_file)
-    ]
-  end
-
-  def generate_signed_pdf(document, signature_coordinates)
-    DocumentService.new(document, *signature_coordinates).generate_signed_pdf
-  end
-
-  def extract_signature_coordinates
-    [
-      params[:signature_x]&.to_i || 100,
-      params[:signature_y]&.to_i || 100
-    ]
-  end
-
-  def save_uploaded_file(file)
-    path = Rails.root.join("storage", file.original_filename)
-    File.open(path, "wb") { |f| f.write(file.read) }
-    path.to_s
-  end
-
-  def create_document(pdf_path, signature_path)
-    @current_user.documents.create!(
-      file_path: pdf_path,
-      signature_path: signature_path,
-      signed: false
-    )
   end
 
   def handle_signature_error(error)
