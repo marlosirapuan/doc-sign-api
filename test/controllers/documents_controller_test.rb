@@ -19,6 +19,35 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     )
   end
 
+  test "should list dcouments" do
+    # Act
+    get documents_url, headers: { Authorization: "Bearer #{@token}" }
+
+    # Assert
+    assert_response :success
+    body = JSON.parse(response.body)
+
+    assert body.is_a?(Array)
+    assert_equal 1, body.size
+    assert_equal @document.id, body.first["id"]
+    assert_equal @document.signed, body.first["signed"]
+    assert body.first["created_at"].present?
+  end
+
+  test "should return empty list if user has no documents" do
+    # Arrange
+    Document.delete_all
+
+    # Act
+    get documents_url, headers: { Authorization: "Bearer #{@token}" }
+
+    # Assert
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert body.is_a?(Array)
+    assert_empty body
+  end
+
   test "should create a document with signature" do
     # Arrange
     pdf = fixture_file_upload("example.pdf", "application/pdf")
