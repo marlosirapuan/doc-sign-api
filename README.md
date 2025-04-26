@@ -32,10 +32,21 @@ Close with `:wq` and follow steps below
 
 3) Sign document for user (replace authorization bearer token):
 
+  PDF:
   ```bash
   curl -X POST http://localhost:3000/documents \
     -H "Authorization: Bearer TOKEN_HERE" \
-    -F "file=@example.pdf" \
+    -F "file=@example_pdf.pdf" \
+    -F "signature=@example_signature.png" \
+    -F "signature_x=100" \
+    -F "signature_y=150"
+  ```
+
+  DOCX:
+  ```bash
+  curl -X POST http://localhost:3000/documents \
+    -H "Authorization: Bearer TOKEN_HERE" \
+    -F "file=@example_doc.docx" \
     -F "signature=@example_signature.png" \
     -F "signature_x=100" \
     -F "signature_y=150"
