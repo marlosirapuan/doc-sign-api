@@ -11,8 +11,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     post login_url, params: { email: @user.email, password: "password123" }, as: :json
     @token = JSON.parse(response.body)["token"]
 
-    @document = Document.create!(
-      user: @user,
+    @document = @user.documents.create!(
       file_path: Rails.root.join("test/fixtures/files/example.pdf").to_s,
       signature_path: Rails.root.join("test/fixtures/files/example_signature.png").to_s,
       signed: true
@@ -32,6 +31,8 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @document.id, body.first["id"]
     assert_equal @document.signed, body.first["signed"]
     assert body.first["created_at"].present?
+
+    assert_equal 1, @document.versions.size
   end
 
   test "should return empty list if user has no documents" do
@@ -62,6 +63,8 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
     body = JSON.parse(response.body)
     assert body["document"].present?
+
+    assert_equal 1, @document.versions.count
   end
 
   test "should download the document successfully" do
