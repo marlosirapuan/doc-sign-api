@@ -40,6 +40,9 @@ gem "thruster", require: false
 gem "prawn"
 gem "combine_pdf"
 
+# Audit
+gem "paper_trail"
+
 group :test do
   # Improve messages output
   gem "minitest-reporters"
