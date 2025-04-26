@@ -9,4 +9,6 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   post "login", to: "authentication#login"
+
+  resources :documents, only: [ :index ]
 end
