@@ -72,8 +72,10 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    ansi (1.5.0)
     ast (2.4.3)
     base64 (0.2.0)
+    bcrypt (3.1.20)
     bcrypt_pbkdf (1.1.1)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
@@ -110,6 +112,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.11.3)
+    jwt (2.10.1)
+      base64
     kamal (2.5.3)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -136,6 +140,14 @@ GEM
     method_source (1.1.0)
     mini_mime (1.1.5)
     minitest (5.25.5)
+    minitest-rails (8.0.0)
+      minitest (~> 5.20)
+      railties (>= 8.0.0, < 8.1.0)
+    minitest-reporters (1.7.1)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
     msgpack (1.8.0)
     net-imap (0.5.7)
       date
@@ -326,10 +338,14 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  bcrypt (~> 3.1.7)
   bootsnap
   brakeman
   debug
+  jwt
   kamal
+  minitest-rails
+  minitest-reporters
   pry-byebug (~> 3.11.0)
   pry-rails (~> 0.3.11)
   puma (>= 5.0)
