@@ -11,8 +11,14 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     post login_url, params: { email: @user.email, password: "password123" }, as: :json
     @token = JSON.parse(response.body)["token"]
 
-    @document = @user.documents.create!(
-      file_path: Rails.root.join("test/fixtures/files/example.pdf").to_s,
+    @document_pdf = @user.documents.create!(
+      file_path: Rails.root.join("test/fixtures/files/example_pdf.pdf").to_s,
+      signature_path: Rails.root.join("test/fixtures/files/example_signature.png").to_s,
+      signed: true
+    )
+
+    @document_doc = @user.documents.create!(
+      file_path: Rails.root.join("test/fixtures/files/example_doc.docx").to_s,
       signature_path: Rails.root.join("test/fixtures/files/example_signature.png").to_s,
       signed: true
     )
@@ -27,12 +33,12 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
 
     assert body.is_a?(Array)
-    assert_equal 1, body.size
-    assert_equal @document.id, body.first["id"]
-    assert_equal @document.signed, body.first["signed"]
+    assert_equal 2, body.size
+    assert_equal @document_pdf.id, body.first["id"]
+    assert_equal @document_pdf.signed, body.first["signed"]
     assert body.first["created_at"].present?
 
-    assert_equal 1, @document.versions.size
+    assert_equal 1, @document_pdf.versions.size
   end
 
   test "should return empty list if user has no documents" do
@@ -49,9 +55,9 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_empty body
   end
 
-  test "should create a document with signature" do
+  test "[pdf] should create a document pdf with signature" do
     # Arrange
-    pdf = fixture_file_upload("example.pdf", "application/pdf")
+    pdf = fixture_file_upload("example_pdf.pdf", "application/pdf")
     signature = fixture_file_upload("example_signature.png", "image/png")
 
     # Act
@@ -64,12 +70,30 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert body["document"].present?
 
-    assert_equal 1, @document.versions.count
+    assert_equal 1, @document_pdf.versions.count
+  end
+
+  test "[docx] should create a document pdf with signature" do
+    # Arrange
+    pdf = fixture_file_upload("example_doc.docx", "application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    signature = fixture_file_upload("example_signature.png", "image/png")
+
+    # Act
+    post documents_url,
+      params: { file: pdf, signature: signature },
+      headers: { Authorization: "Bearer #{@token}" }
+
+    # Assert
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert body["document"].present?
+
+    assert_equal 1, @document_pdf.versions.count
   end
 
   test "should download the document successfully" do
     # Arrange & Act
-    get download_document_url(@document), headers: { Authorization: "Bearer #{@token}" }
+    get download_document_url(@document_pdf), headers: { Authorization: "Bearer #{@token}" }
 
     # Assert
     assert_response :success
@@ -78,7 +102,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
 
   test "should return 404 if file does not exist" do
     # Arrange
-    @document = Document.create!(
+    @document_pdf = Document.create!(
       user: @user,
       file_path: Rails.root.join("test/fixtures/files/non_existent_file.pdf").to_s,
       signature_path: Rails.root.join("test/fixtures/files/non_existent_signature.png").to_s,
@@ -86,7 +110,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     )
 
     # Act
-    get download_document_url(@document), headers: { Authorization: "Bearer #{@token}" }
+    get download_document_url(@document_pdf), headers: { Authorization: "Bearer #{@token}" }
 
     # Assert
     assert_response :not_found
