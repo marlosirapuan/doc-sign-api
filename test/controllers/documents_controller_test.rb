@@ -99,14 +99,16 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, @document_pdf.versions.count
   end
 
-  test "[docx] should create a document pdf with signature" do
+  test "[docx] should create a document with signature and metadata" do
     # Arrange
-    pdf       = fixture_file_upload("example_doc.docx", MIME_TYPES["docx"])
-    signature = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
+    docx        = fixture_file_upload("example_doc.docx", MIME_TYPES["docx"])
+    signature   = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
+    ip          = "127.0.0.1"
+    geolocation = "-23.545531,-46.473373"
 
     # Act
     post documents_url,
-      params: { file: pdf, signature: signature },
+      params: { file: docx, signature: signature, ip: ip, geolocation: geolocation },
       headers: { Authorization: "Bearer #{@token}" }
 
     # Assert
@@ -114,7 +116,10 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert body["document"].present?
 
-    assert_equal 1, @document_pdf.versions.count
+    document = Document.find(body["document"]["id"])
+    assert_equal ip, document.ip
+    assert_equal geolocation, document.geolocation
+    assert_equal 2, document.versions.count
   end
 
   test "should download the document successfully" do

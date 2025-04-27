@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_26_180337) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_27_141958) do
   create_table "documents", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "file_path"
@@ -18,6 +18,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_26_180337) do
     t.boolean "signed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "metadata", default: {}
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
 
