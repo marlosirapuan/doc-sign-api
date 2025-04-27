@@ -40,26 +40,30 @@ class SignedDocumentService
 
   def create_signature_and_footer_pdfs
     original_pdf = CombinePDF.load(@document.file_path)
+    footer_text  = generate_footer_text
 
+    original_pdf.pages.each_with_index.map do |_, index|
+      generate_temp_pdf(index, footer_text)
+    end
+  end
+
+  def generate_footer_text
     metadata         = @document.metadata || {}
     ip_info          = metadata["ip"] || "--"
     geolocation_info = metadata["geolocation"] || "--"
-    footer_text      = "IP #{ip_info} | Geolocation #{geolocation_info}"
-    temp_paths       = []
 
-    original_pdf.pages.each_with_index do |_, index|
-      temp_pdf_path = Rails.root.join("storage", "signature_and_footer_temp_#{index}.pdf")
+    "IP #{ip_info} | Geolocation #{geolocation_info}"
+  end
 
-      Prawn::Document.generate(temp_pdf_path, page_size: "A4") do |pdf|
-        pdf.image @document.signature_path, at: [ @signature_x, @signature_y ], width: SIGNATURE_WIDTH
-        pdf.bounding_box([ 0, 30 ], width: pdf.bounds.width, height: 30) do
-          pdf.text footer_text, size: 8, align: :center
-        end
+  def generate_temp_pdf(index, footer_text)
+    temp_pdf_path = Rails.root.join("storage", "signature_and_footer_temp_#{index}.pdf")
+    Prawn::Document.generate(temp_pdf_path, page_size: "A4") do |pdf|
+      pdf.image @document.signature_path, at: [ @signature_x, @signature_y ], width: SIGNATURE_WIDTH
+      pdf.bounding_box([ 0, 30 ], width: pdf.bounds.width, height: 30) do
+        pdf.text footer_text, size: 8, align: :center
       end
-      temp_paths << temp_pdf_path
     end
-
-    temp_paths
+    temp_pdf_path
   end
 
   def combine_and_save_pdfs(signature_footer_paths, signed_pdf_path)
