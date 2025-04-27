@@ -6,9 +6,9 @@ class DocumentsController < ApplicationController
   rescue_from SignatureNotFoundError, with: :handle_signature_error
 
   def index
-    documents = @current_user.documents.select(:id, :signed, :created_at, :file_path)
+    documents = @current_user.documents.select(:id, :signed, :created_at, :file_path, :metadata)
 
-    render json: documents.as_json(only: [ :id, :signed, :created_at, :file_path ])
+    render json: documents.as_json(only: [ :id, :signed, :created_at, :file_path, :metadata ])
   end
 
   def create

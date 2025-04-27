@@ -15,6 +15,8 @@ class DocumentService
 
     document = create_document(pdf_path, signature_path)
     generate_signed_pdf(document, signature_coordinates)
+
+    document
   end
 
   private
@@ -61,7 +63,9 @@ class DocumentService
     current_user.documents.create!(
       file_path: pdf_path,
       signature_path: signature_path,
-      signed: false
+      signed: false,
+      ip: input[:ip],
+      geolocation: input[:geolocation]
     )
   end
 end
