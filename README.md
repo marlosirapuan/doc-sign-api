@@ -2,6 +2,13 @@
 
 Small API project to sign document with attachment
 
+### Stack
+
+- Ruby v3.4.2
+- SQLite3
+- Minitest
+- Docker
+
 ### Getting started
 
 Create a new credentials and generate master key
@@ -12,7 +19,6 @@ Create a new credentials and generate master key
   ```
 
 Close with `:wq` and follow steps below
-
 
 ### How start application
 
@@ -35,7 +41,7 @@ Close with `:wq` and follow steps below
   PDF:
   ```bash
   curl -X POST http://localhost:3000/documents \
-    -H "Authorization: Bearer TOKEN_HERE" \
+    -H "Authorization: Bearer TOKEN_VALUE_HERE" \
     -F "file=@example_pdf.pdf" \
     -F "signature=@example_signature.png" \
     -F "signature_x=100" \
@@ -45,7 +51,7 @@ Close with `:wq` and follow steps below
   DOCX:
   ```bash
   curl -X POST http://localhost:3000/documents \
-    -H "Authorization: Bearer TOKEN_HERE" \
+    -H "Authorization: Bearer TOKEN_VALUE_HERE" \
     -F "file=@example_doc.docx" \
     -F "signature=@example_signature.png" \
     -F "signature_x=100" \
@@ -71,11 +77,11 @@ Close with `:wq` and follow steps below
 Run tests:
 
   ```bash
-  docker compose up test
+  docker compose run --rm test
   ```
 
   or
 
   ```bash
-  docker compose run --rm test
+  docker compose up test
   ```
