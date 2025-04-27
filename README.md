@@ -1,6 +1,6 @@
 # doc-sign-api
 
-Small API project to sign document with attachment
+Small API project to sign documents with attachments.
 
 ### Stack
 
@@ -11,7 +11,7 @@ Small API project to sign document with attachment
 
 ### Getting started
 
-Create a new credentials and generate master key
+Create new credentials and generate master key
 
   ```bash
   rm config/credentials.yml.enc config/master.key
@@ -20,9 +20,9 @@ Create a new credentials and generate master key
 
 Close with `:wq` and follow steps below
 
-### How start application
+### How to start the application
 
-1) Run app:
+1) Run the app:
 
   ```bash
   docker compose up app
@@ -58,7 +58,7 @@ Close with `:wq` and follow steps below
     -F "signature_y=150"
   ```
 
-4) View document signed:
+4) View the signed document:
 
   ```bash
   docker compose run --rm app rails c
@@ -72,18 +72,12 @@ Close with `:wq` and follow steps below
   /app/storage/example_signed.pdf
   ```
 
-### How run tests
+### How to run tests
 
 Run tests:
 
   ```bash
   docker compose run --rm test
-  ```
-
-  or
-
-  ```bash
-  docker compose up test
   ```
 
 Frontend for this application:
