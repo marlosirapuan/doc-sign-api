@@ -1,6 +1,12 @@
 require "test_helper"
 
 class DocumentsControllerTest < ActionDispatch::IntegrationTest
+  MIME_TYPES = {
+    "pdf"  => "application/pdf",
+    "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "png"  => "image/png"
+  }.freeze
+
   setup do
     @user = User.create!(
       name: "User1",
@@ -11,17 +17,33 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     post login_url, params: { email: @user.email, password: "password123" }, as: :json
     @token = JSON.parse(response.body)["token"]
 
-    @document_pdf = @user.documents.create!(
-      file_path: Rails.root.join("test/fixtures/files/example_pdf.pdf").to_s,
-      signature_path: Rails.root.join("test/fixtures/files/example_signature.png").to_s,
+    pdf_file       = fixture_file_upload("example_pdf.pdf", MIME_TYPES["pdf"])
+    signature_file = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
+    @document_pdf  = @user.documents.create!(
+      file_path: store_test_file(pdf_file),
+      signature_path: store_test_file(signature_file),
       signed: true
     )
 
-    @document_doc = @user.documents.create!(
-      file_path: Rails.root.join("test/fixtures/files/example_doc.docx").to_s,
-      signature_path: Rails.root.join("test/fixtures/files/example_signature.png").to_s,
+    doc_file           = fixture_file_upload("example_doc.docx", MIME_TYPES["docx"])
+    doc_signature_file = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
+    @document_doc      = @user.documents.create!(
+      file_path: store_test_file(doc_file),
+      signature_path: store_test_file(doc_signature_file),
       signed: true
     )
+
+    # to exclude
+    @document = @user.documents.create!(
+      file_path: store_test_file(pdf_file),
+      signature_path: store_test_file(signature_file),
+      signed: true
+    )
+  end
+
+  teardown do
+    File.delete(@document.file_path) if File.exist?(@document.file_path)
+    File.delete(@document.signature_path) if File.exist?(@document.signature_path)
   end
 
   test "should list dcouments" do
@@ -33,7 +55,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
 
     assert body.is_a?(Array)
-    assert_equal 2, body.size
+    assert_equal 3, body.size
     assert_equal @document_pdf.id, body.first["id"]
     assert_equal @document_pdf.signed, body.first["signed"]
     assert body.first["created_at"].present?
@@ -57,8 +79,8 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
 
   test "[pdf] should create a document pdf with signature" do
     # Arrange
-    pdf = fixture_file_upload("example_pdf.pdf", "application/pdf")
-    signature = fixture_file_upload("example_signature.png", "image/png")
+    pdf = fixture_file_upload("example_pdf.pdf", MIME_TYPES["pdf"])
+    signature = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
 
     # Act
     post documents_url,
@@ -75,8 +97,8 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
 
   test "[docx] should create a document pdf with signature" do
     # Arrange
-    pdf = fixture_file_upload("example_doc.docx", "application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    signature = fixture_file_upload("example_signature.png", "image/png")
+    pdf       = fixture_file_upload("example_doc.docx", MIME_TYPES["docx"])
+    signature = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
 
     # Act
     post documents_url,
@@ -116,5 +138,30 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     body = JSON.parse(response.body)
     assert_equal "File not found", body["error"]
+  end
+
+  test "should destroy document and delete files" do
+    assert File.exist?(@document.file_path), "PDF file should exist before delete"
+    assert File.exist?(@document.signature_path), "Signature file should exist before delete"
+
+    assert_difference "Document.count", -1 do
+      delete document_url(@document), headers: { Authorization: "Bearer #{@token}" }
+    end
+
+    assert_response :success
+
+    refute File.exist?(@document.file_path), "PDF file should be deleted after destroy"
+    refute File.exist?(@document.signature_path), "Signature file should be deleted after destroy"
+  end
+
+  private
+
+  def store_test_file(file)
+    folder = Rails.root.join("storage")
+    FileUtils.mkdir_p(folder) unless Dir.exist?(folder)
+
+    path = folder.join(file.original_filename)
+    File.open(path, "wb") { |f| f.write(file.read) }
+    path.to_s
   end
 end

@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   post "login", to: "authentication#login"
 
-  resources :documents, only: [ :index, :create ] do
+  resources :documents, only: [ :index, :create, :destroy ] do
     member do
       get :download
     end
