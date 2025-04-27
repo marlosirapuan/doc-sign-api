@@ -8,42 +8,45 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
   }.freeze
 
   setup do
-    @user = User.create!(
+    @user = create_user_with_token
+
+    @document_pdf = create_document("example_pdf.pdf", "example_signature.png",  MIME_TYPES["pdf"],  true)
+    @document_doc = create_document("example_doc.docx", "example_signature.png", MIME_TYPES["docx"], true)
+    @document     = create_document("example_pdf.pdf", "example_signature.png",  MIME_TYPES["pdf"],  true)
+  end
+
+  teardown do
+    delete_document_files(@document)
+  end
+
+  private
+
+  def create_user_with_token
+    user = User.create!(
       name: "User1",
       email: "user1example@test.com",
       password: "password123"
     )
 
-    post login_url, params: { email: @user.email, password: "password123" }, as: :json
+    post login_url, params: { email: user.email, password: "password123" }, as: :json
     @token = JSON.parse(response.body)["token"]
+    user
+  end
 
-    pdf_file       = fixture_file_upload("example_pdf.pdf", MIME_TYPES["pdf"])
-    signature_file = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
-    @document_pdf  = @user.documents.create!(
-      file_path: store_test_file(pdf_file),
-      signature_path: store_test_file(signature_file),
-      signed: true
-    )
+  def create_document(file_name, signature_name, mime_type, signed)
+    file      = fixture_file_upload(file_name, mime_type)
+    signature = fixture_file_upload(signature_name, MIME_TYPES["png"])
 
-    doc_file           = fixture_file_upload("example_doc.docx", MIME_TYPES["docx"])
-    doc_signature_file = fixture_file_upload("example_signature.png", MIME_TYPES["png"])
-    @document_doc      = @user.documents.create!(
-      file_path: store_test_file(doc_file),
-      signature_path: store_test_file(doc_signature_file),
-      signed: true
-    )
-
-    # to exclude
-    @document = @user.documents.create!(
-      file_path: store_test_file(pdf_file),
-      signature_path: store_test_file(signature_file),
-      signed: true
+    @user.documents.create!(
+      file_path: store_test_file(file),
+      signature_path: store_test_file(signature),
+      signed: signed
     )
   end
 
-  teardown do
-    File.delete(@document.file_path) if File.exist?(@document.file_path)
-    File.delete(@document.signature_path) if File.exist?(@document.signature_path)
+  def delete_document_files(document)
+    File.delete(document.file_path) if File.exist?(document.file_path)
+    File.delete(document.signature_path) if File.exist?(document.signature_path)
   end
 
   test "should list dcouments" do
