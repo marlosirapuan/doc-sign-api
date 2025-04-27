@@ -61,6 +61,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 3, body.size
     assert_equal @document_pdf.id, body.first["id"]
     assert_equal @document_pdf.signed, body.first["signed"]
+    assert_equal @document_pdf.file_path, body.first["file_path"]
     assert body.first["created_at"].present?
 
     assert_equal 1, @document_pdf.versions.size
