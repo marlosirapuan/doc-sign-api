@@ -80,6 +80,8 @@ Run tests:
   docker compose run --rm test
   ```
 
+---
+
 Frontend for this application:
 
 [https://github.com/marlosirapuan/doc-sign-web](https://github.com/marlosirapuan/doc-sign-web)
