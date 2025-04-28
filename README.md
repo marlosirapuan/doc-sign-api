@@ -11,7 +11,7 @@ Small API project to sign documents with attachments.
 
 ### Getting started
 
-Create new credentials and generate master key
+Create new credentials and generate master key. This step is very important to build the app with the credentials master key. Without this, will be invalid token. Run the two command below BEFORE the start application
 
   ```bash
   rm config/credentials.yml.enc config/master.key
