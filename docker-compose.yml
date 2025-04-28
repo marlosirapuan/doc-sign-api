@@ -8,7 +8,7 @@ services:
       - "3000:3000"
     environment:
       RAILS_ENV: development
-      RAILS_MASTER_KEY_BASE: 740a6a8a27ab5ba8a866c5aaea8c248a
+      SECRET_BASE_KEY: 740a6a8a27ab5ba8a866c5aaea8c248a
     command: bash -c "
       rm -f tmp/pids/server.pid &&
       rails db:prepare &&
