@@ -9,17 +9,6 @@ Small API project to sign documents with attachments.
 - Minitest
 - Docker
 
-### Getting started
-
-Create new credentials and generate master key. This step is very important to build the app with the credentials master key. Without this, will be invalid token. Run the two command below BEFORE the start application
-
-  ```bash
-  rm config/credentials.yml.enc config/master.key
-  EDITOR="vi" rails credentials:edit
-  ```
-
-Close with `:wq` and follow steps below
-
 ### How to start the application
 
 1) Run the app:
